@@ -1,0 +1,88 @@
+<body>
+  <nav id="nav-menu">
+    <!--  Hero Image -->
+    <ul class="header-sidebar invisible">
+      <li class="logo-sidebar">
+        <a href="https://www.appboy.com/"></a>
+      </li>
+      <li>
+        <a href="https://academy.appboy.com/">ACADEMY</a>
+      </li>
+      <li>
+        <a href="https://community.appboy.com/">COMMUNITY</a>
+      </li>
+      <li><hr></li>
+    </ul>
+
+    <!--  Platform-Independent Table of Contents -->
+    <div id="platform-independent">
+      <ul class="platforms">
+        <!--  Populate list of platforms from /_includes/platforms.md -->
+        {% capture platforms %}{% include platforms.md %}{% endcapture %}
+        {{ platforms | markdownify }}
+      </ul>
+      <!-- Add all platform-independent pages to nav -->
+      {% assign pages = site.pages | sort:"weight" %}
+      {% for page in pages %}
+      {% if page.isPlatform == false %}
+      <ul class="nav" id="{{ page.collection }}">
+        <li>
+          <a class="page-link h0" href="{{ page.url | prepend: site.baseurl | remove: 'index.html' }}">
+            {{ page.title }}
+          </a>
+        </li>
+      </ul>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <!--  Platform Table of Contents -->
+    {% if page.isPlatform == true %}
+    <hr>
+    <!-- Add platform title to nav -->
+    <ul class="nav">
+      <li><a class="h0" href="{{ page.url | prepend: site.baseurl | remove: 'index.html' }}">{{ page.title }}{% if page.subplatform %} {{ page.subplatform }}{% endif %}</a></li>
+      <div id="toc"></div>
+    </ul>
+    {% endif %}
+
+    <!--  Footer Box -->
+    <div class="additional-links">
+      <p><a href="https://github.com/appboy/">Appboy Public Github Repositories</a></p>
+      {% if page.platform == 'iOS' %}
+      <p><a href="https://github.com/Appboy/appboy-ios-sdk/blob/master/CHANGELOG.md">Appboy iOS SDK Changelog</a></p>
+      <p><a href="http://appboy.github.io/appboy-ios-sdk/docs/">Full iOS Class Documentation</a></p>
+      {% elsif page.platform == 'Android' or page.platform == 'FireOS' %}
+      <p><a href="https://github.com/Appboy/appboy-android-sdk/blob/master/CHANGELOG.md">Appboy Android SDK Changelog</a></p>
+      <p><a href="http://appboy.github.io/appboy-android-sdk/javadocs/">Android SDK Javadoc</a></p>
+      {% elsif page.platform == 'Windows' %}
+      <p><a href="https://github.com/Appboy/appboy-windows-samples/blob/master/CHANGELOG.md">Appboy Windows SDK Changelog</a></p>
+      {% elsif page.platform == 'Unity' %}
+      <p><a href="https://github.com/Appboy/appboy-unity-sdk/blob/master/CHANGELOG.md">Appboy Unity SDK Changelog</a></p>
+      {% elsif page.platform == 'Web' %}
+      <p><a href="https://github.com/Appboy/appboy-web-sdk/blob/master/CHANGELOG.md">Appboy Web SDK Changelog</a></p>
+      {% endif %}
+      <p><a href="http://status.appboy.com/">Appboy System Status Monitor</a></p>
+    </ul>
+  </nav>
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+    // Dynamically append table of contents (ToC) based on current page section
+    $('#{{ page.collection }}').append('<div id="toc"></div>');
+    $('#{{ page.collection }} .section-header').addClass('active');
+    // Only show headers h1-h3 in the navigation bar ToC
+    $('#toc').toc({ headers: 'h1, h2, h3, h4' });
+
+    // Use Bootstrap's "Scrollspy" plugin to dynamically expand/collapse ToC
+    $('body').scrollspy({
+      target: '#toc',
+      offset: 100
+    });
+
+    // Append carets to TOC h2 elements with nested h3 elements
+    $carets = $('#toc .nav .nav>li').has('ul');
+    $carets.children("a").addClass('caret');
+  });
+  </script>
+</body>

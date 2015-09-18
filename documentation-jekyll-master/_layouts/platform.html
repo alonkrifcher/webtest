@@ -1,0 +1,60 @@
+---
+layout: default
+---
+<!--
+Generates section page based on the files in each page's collection folder (i.e., _Getting_Started).
+This functionality depends on specifying a page's collection variable in its YAML front-matter
+(i.e., in Getting_Started.md, we declare the variable 'collection : Getting_Started').
+-->
+{% for article in site.Platform-Wide %}
+  <!-- Add articles under /_collections/Platform-Wide first, unless they have 'section: Analytics' declared in their YAML front matter -->
+  {% if article.placement_logic %}
+  <!-- Do not display Platform-Wide articles if they have additional placement logic (i.e., aren't meant to go at the very top) -->
+  {% else %}
+  <div class="article">
+    <article class="article-content">
+      {{ article.content | markdownify }}
+    </article>
+  </div>
+  {% endif %}
+{% endfor %}
+
+{% for article in site.[page.collection] %}
+<!-- Add Analytics > Best Practices as first article under Analytics -->
+  {% if article.title == 'Analytics' %}
+    {% if article.subplatform and article.subplatform != page.subplatform %}
+    {% else %}
+      <div class="article">
+        <article class="article-content">
+          {{ article.content }}
+        </article>
+      </div>
+
+      {% for article in site.Platform-Wide %}
+        {% if article.title == 'Analytics Overview' %}
+        <div class="article">
+          <article class="article-content">
+            {{ article.content }}
+          </article>
+        </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+<!-- Display all articles -->
+  {% else %}
+    {% if article.android_or_fireos and article.android_or_fireos != page.android_or_fireos %}
+    <!-- Do not display Android/FireOS-specific article (i.e., Android > Push vs. FireOS > Push) if it doesn't belong to the correct platform -->
+    {% elsif article.subplatform and article.subplatform != page.subplatform %}
+    <!-- Do not display article if it doesn't belong to the correct subplatform -->
+    {% else %}
+
+      <div class="article">
+        <article class="article-content">
+          {{ article.content }}
+        </article>
+      </div>
+    {% endif %}
+
+  {% endif %}
+{% endfor %}

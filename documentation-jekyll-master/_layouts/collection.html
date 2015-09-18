@@ -1,0 +1,10 @@
+---
+layout: default
+---
+{% for article in site.[page.collection] %}
+  <div class="article">
+    <article class="article-content">
+      {{ article.content }}
+    </article>
+  </div>
+{% endfor %}
