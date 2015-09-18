@@ -1,0 +1,52 @@
+<head>
+  <script type="text/javascript">
+  $(document).ready(function() {
+    // Use Bootstrap's "Affix" plugin to pin nav bar to top
+    $('.menu-icon').on('click', function() {
+      $('#sidebar').toggleClass("reveal");
+      // $('.menu-icon').toggleClass("slide");
+
+    })
+  });
+  </script>
+</head>
+<div class="menu-icon">
+    <i class="fa fa-bars"></i>
+</div>
+
+<header id="header">
+  <div class="holder">
+      <span class="logo">
+        <a href="https://www.appboy.com/"></a>
+      </span>
+    <div class="options">
+      <div class="add-row">
+        <ul class="add-links">
+          <li>
+            <a href="https://dashboard.appboy.com/developers/sign_in">LOG IN</a>
+          </li>
+          <li class="alt">
+            <a class="tracked-button" data-track="Header - Sign Up" href="https://dashboard.appboy.com/developers/sign_up?referral_source=Website">SIGN UP</a>
+          </li>
+        </ul>
+        <a class="link tracked-button" data-track="Header - Contact Us" href="/contact">Contact</a>
+      </div>
+      <nav class="nav-box">
+        <ul>
+          <li>
+            <a href="https://academy.appboy.com/">ACADEMY</a>
+          </li>
+          <li>
+            <a href="https://documentation.appboy.com/">DOCUMENTATION</a>
+          </li>
+          <li>
+            <a href="https://community.appboy.com/">COMMUNITY</a>
+          </li>
+          <li>
+            <a href="https://blog.appboy.com/">BLOG</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>

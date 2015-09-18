@@ -1,0 +1,15 @@
+---
+layout: default
+---
+<!--
+Generates section page based on the files in each page's collection folder (i.e., /_collections/Getting_Started/).
+This functionality depends on specifying a page's collection variable in its YAML front-matter
+(i.e., in /_pages/Getting_Started/index.md, we declare the variable 'collection : Getting_Started').
+-->
+{% for article in site.[page.collection] %}
+  <div class="article">
+    <article class="article-content">
+      {{ article.content }}
+    </article>
+  </div>
+{% endfor %}

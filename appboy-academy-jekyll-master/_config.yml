@@ -1,0 +1,45 @@
+# Site settings
+title: Appboy Academy
+email: success@appboy.com
+description: > # this means to ignore newlines until "baseurl:"
+  Welcome to Appboy Academy! Learn how to become a mobile marketing expert and
+  effectively use Appboy’s tools. Appboy Academy gives you the knowledge, skills
+  and best practices to engage your users beyond the download.
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "https://academy.appboy.com" # the base hostname & protocol for your site
+twitter_username: Appboy
+github_username:  Appboy
+permalink: /:title/
+
+# Pages directory
+include: ["_pages"]
+
+# Don't serve non-jekyll files
+exclude: ['config.ru', 'Gemfile', 'Gemfile.lock', 'README.md', 'Procfile', 'Rakefile', 'vendor']
+
+# Build settings
+markdown: kramdown
+
+kramdown:
+  input: GFM
+  use_coderay: true # code highlighting
+  coderay:
+    coderay_line_numbers: nil
+    coderay_css: class
+
+# Collections
+collections:
+  Getting_Started:
+    relative_directory: _collections/Getting_Started
+  User_Targeting:
+    relative_directory: _collections/User_Targeting
+  Dashboard_Features:
+    relative_directory: _collections/Dashboard_Features
+  Campaign_Ideas_and_Strategies:
+    relative_directory: _collections/Campaign_Ideas_and_Strategies
+  Scheduling_and_Organizing_Campaigns:
+    relative_directory: _collections/Scheduling_and_Organizing_Campaigns
+  Data_and_Analytics:
+    relative_directory: _collections/Data_and_Analytics
+  Best_Practices:
+    relative_directory: _collections/Best_Practices

@@ -1,0 +1,61 @@
+<body>
+  <nav id="nav-menu">
+    <!--  Hero Image -->
+    <ul class="header-sidebar invisible">
+      <li class="logo-sidebar">
+        <a href="https://www.appboy.com/"></a>
+      </li>
+      <li>
+        <a href="https://documentation.appboy.com/">DOCUMENTATION</a>
+      </li>
+      <li>
+        <a href="https://community.appboy.com/">COMMUNITY</a>
+      </li>
+      <li>
+        <a href="https://blog.appboy.com/">BLOG</a>
+      </li>
+      <li><hr></li>
+    </ul>
+
+    <!-- Add all pages (/_pages/.../index.md) to nav -->
+    <!-- Sort pages by weight variable (as declared in YAML front matter in /_pages/.../index.md) -->
+    {% assign pages = site.pages | sort:"weight" %}
+    {% for page in pages %}
+    {% if page.title != 404 %}
+    <ul class="nav" id="{{ page.collection }}">
+      <li>
+        <a class="page-link section-header" href="{{ page.url | prepend: site.baseurl | remove: 'index.html' }}">
+          {{ page.title }}
+        </a>
+      </li>
+    </ul>
+    {% endif %}
+    {% endfor %}
+
+    <!-- Footer Box -->
+    <div class="additional-links">
+        <p><a href="http://status.appboy.com/">Appboy System Status Monitor</a></p>
+        <p><a href="https://github.com/Appboy/appboy-academy-jekyll">Appboy Academy Github Repository</a></p>
+    </ul>
+  </nav>
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+    // Dynamically append table of contents (ToC) based on current page section
+    $('#{{ page.collection }}').append('<div id="toc"></div>');
+    $('#{{ page.collection }} .section-header').addClass('active');
+    // Only show headers h1-h3 in the navigation bar ToC
+    $('#toc').toc({ headers: 'h1, h2, h3' });
+    // Append carets to TOC h2 elements with nested h3 elements
+
+    // Use Bootstrap's "Scrollspy" plugin to dynamically expand/collapse ToC
+    $('body').scrollspy({
+      target: '#toc',
+      offset: 100
+    });
+
+    $carets = $('#toc .nav .nav>li').has('ul');
+    $carets.children("a").addClass('caret');
+  });
+  </script>
+</body>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+{% include head.html %}
+
+<body>
+  {% include header.html %}
+<div class="banner">
+  <div class="container">
+    <img class="banner-image" src="/assets/img/appboy_academy_header.png">
+    <span class="banner-title">Appboy Academy</span>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <div id="sidebar" class="col-md-3 sidebar">
+      {% include nav.html %}
+    </div>
+
+    <div class="col-md-9 col-xs-12 content">
+      <div class="wrapper">
+        {{ content }}
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+
+</html>
