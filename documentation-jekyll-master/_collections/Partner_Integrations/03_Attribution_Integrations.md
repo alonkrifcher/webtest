@@ -10,8 +10,8 @@ Appboy supports integrations with several partners that track the users you acqu
 
 | Partner | iOS Support? | Android Support? | Windows Support? |
 | ------- | ------------ | ---------------- | ---------------- |
-| Adjust | Yes | No | No |
-| Appsflyer | Yes | Yes | No |
+| Adjust | Yes | Yes | No |
+| AppsFlyer | Yes | Yes | No |
 | Apsalar | Yes | No | No |
 | Kochava | Yes | No | No |
 | Tune (MobileAppTracking) | Yes | Yes | Yes |
@@ -28,7 +28,7 @@ Don't see your attribution service listed here? We might be able to add them! Co
 Please note that attribution data for Twitter and Facebook campaigns is not available through our partners. Facebook and Twitter do not permit their partners to share attribution data with third-parties and, therefore, our partners cannot send that data to Appboy.
 
 ### API Restrictions
-Appboy's attribution integrations are built on top of our REST API and subject to the same limits. In particular:
+Appboy's attribution integrations (except Adjust) are built on top of our REST API and subject to the same limits. In particular:
 
 - Access for enterprise customers is unlimited, but subject to contract terms.
 - Access for non-enterprise customers is limited to 100 requests (i.e. up to 100 attributed installs) per hour.
@@ -40,55 +40,74 @@ Appboy's attribution integrations are built on top of our REST API and subject t
 
 __Step 1: Integration Requirements__
 
-* This integration supports iOS apps only.
-* If you expect more than 100 attributed installs per hour, you will need an Appboy Enterprise account. See [API Restrictions][5] for more information.
+* This integration supports iOS and Android apps.
 * Your app will need Appboy's SDK and Adjust's SDK installed.
-* You will need to [enable IDFA collection][13] in Appboy's SDK.
 
-__Step 2: Getting the Postback URL__
+__Step 2: Modifying your app code__
 
-In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14]. This page has postback urls for every attribution partner. This url represents the api endpoint that an attribution partner will send data to. Find the url for Adjust. You will need this url in the next step when setting up a callback in Adjust's dashboard.
+Appboy's integration with Adjust is an SDK-to-SDK integration, meaning that attribution data is collected by Adjust's API and then sent to Appboy through the Appboy SDK. For this to work, you will need to modify your app's code.
 
-__Step 3: Setting Up A Callback from Adjust__
+**On iOS**, you will need to modify your app code to [register an attribution callback with Adjust][20] that calls `setAttributionData` from Appboy's SDK. Example code snippet:
 
-Follow [these instructions][15] to add a callback in Adjust's dashboard. The callback should point to the Postback URL you copied from Appboy's Dashboard in Step 2. The callback should be for install events only and should be configured to exclude organic installs.
+```
+- (void)adjustAttributionChanged:(ADJAttribution *)attribution {
+  ABKAttributionData *attributionData = [[ABKAttributionData alloc]
+                                         initWithNetwork:attribution.network
+                                         campaign:attribution.campaign
+                                         adGroup:attribution.adgroup
+                                         creative:attribution.creative];
+  [[Appboy sharedInstance].user setAttributionData:attributionData];
+}
+```
 
-Appboy maps Adjust's url parameters to segment filters in the following way:
+**On Android**, you will need to modify your app code to [set a listener for Adjust attribution changes]
+[21] that calls `setAttributionData` from Appboy's SDK. Example code snippet:
 
-| Adjust URL Parameter | Appboy Segment Filter |
+```
+config.setOnAttributionChangedListener(new OnAttributionChangedListener() {
+  @Override
+  public void onAttributionChanged(AdjustAttribution attribution) {
+    Appboy.getInstance(getApplicationContext()).getCurrentUser().setAttributionData(new AttributionData(
+        attribution.network,
+        attribution.campaign,
+        attribution.adgroup,
+        attribution.creative));
+  }
+});
+```
+
+Assuming you configure your integration as suggested above, Appboy will map Adjust's data to segment filters in the following way:
+
+| Adjust Attribution Parameter | Appboy Segment Filter |
 | -------------------- | --------------------- |
 | {network_name} | Attributed Source |
 | {campaign_name} | Attributed Campaign |
 | {adgroup_name} | Attributed Adgroup |
 | {creative_name} | Attributed Ad |
 
-__Step 4: Confirming the Integration__
-
-Once Appboy recieves attribution data from Adjust, the status connection indicator on ["3rd Party Integrations" > "Attribution"][14] will change to green and a timestamp of the last successful request will be included. Note that this will not happen until we receive data about an __attributed__ install. Organic installs, which should be excluded from the Adjust callback, are ignored by our API and are not counted when determining if a successful connection was established.
-
-### Appsflyer
+### AppsFlyer
 __Step 1: Integration Requirements__
 
 * This integration supports iOS and Android apps.
 * If you expect more than 100 attributed installs per hour, you will need an Appboy Enterprise account. See [API Restrictions][5] for more information.
-* Your app will need Appboy's SDK and Appsflyer's SDK installed.
+* Your app will need Appboy's SDK and AppsFlyer's SDK installed.
 * If you have an iOS app, you will need to [enable IDFA collection][13] in Appboy's SDK.
-* If you have an Android app, you will need to include the code snippet below, which passes a unique Appboy device id to Appsflyer. For most setups, this code should be included alongside all calls to `AppsFlyerLib.setAppsFlyerKey`, typically in an activity's `onCreate` callback.
+* If you have an Android app, you will need to include the code snippet below, which passes a unique Appboy device id to AppsFlyer. For most setups, this code should be included alongside all calls to `AppsFlyerLib.setAppsFlyerKey`, typically in an activity's `onCreate` callback.
 ```java
 AppsFlyerLib.setAppUserId(Appboy.getInstance(MyActivity.this).getInstallTrackingId());
 ```
 
 __Step 2: Getting the Postback URL__
 
-In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14]. This page has postback urls for every attribution partner. This url represents the api endpoint that an attribution partner will send data to. Find the url for Appsflyer. You will need this url in the next step when setting up a callback in Appsflyer's dashboard.
+In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14] and find the Postback URL in the AppsFlyer section. This url represents the API endpoint that an attribution partner will send data to. You will need this url in the next step when setting up a callback in AppsFlyer's dashboard.
 
-__Step 3: Setting Up Appsflyer's Push API__
+__Step 3: Setting Up AppsFlyer's Push API__
 
-Follow [these instructions][16] to configure Appsflyer's Push API so that it sends attribution data to Appboy. This should be configured to send to the Postback URL you copied from Appboy's Dashboard in Step 2. Also configure the Push API to only send data for non-organic installs.
+Follow [these instructions][16] to configure AppsFlyer's Push API so that it sends attribution data to Appboy. This should be configured to send to the Postback URL you copied from Appboy's Dashboard in Step 2. Also configure the Push API to only send data for non-organic installs.
 
-Appboy maps Appsflyer's data fields to segment filters in the following way
+Appboy maps AppsFlyer's data fields to segment filters in the following way
 
-| Appsflyer Data Field | Appboy Segment Filter |
+| AppsFlyer Data Field | Appboy Segment Filter |
 | -------------------- | --------------------- |
 | media_source | Attributed Source |
 | campaign | Attributed Campaign |
@@ -97,7 +116,7 @@ Appboy maps Appsflyer's data fields to segment filters in the following way
 
 __Step 4: Confirming the Integration__
 
-Once Appboy recieves attribution data from Appsflyer, the status connection indicator on ["3rd Party Integrations" > "Attribution"][14] will change to green and a timestamp of the last successful request will be included. Note that this will not happen until we receive data about an __attributed__ install. Organic installs, which should be excluded by the Appsflyer Push API, are ignored by our API and are not counted when determining if a successful connection was established.
+Once Appboy recieves attribution data from AppsFlyer, the status connection indicator on ["3rd Party Integrations" > "Attribution"][14] will change to green and a timestamp of the last successful request will be included. Note that this will not happen until we receive data about an __attributed__ install. Organic installs, which should be excluded by the AppsFlyer Push API, are ignored by our API and are not counted when determining if a successful connection was established.
 
 ### Apsalar
 __Step 1: Integration Requirements__
@@ -109,7 +128,7 @@ __Step 1: Integration Requirements__
 
 __Step 2: Getting the Postback URL__
 
-In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14]. This page has postback urls for every attribution partner. This url represents the api endpoint that an attribution partner will send data to. Find the url for Apsalar. You will need this url in the next step when setting up a callback in Apsalar's dashboard.
+In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14] and find the Postback URL in the Apsalar section. This url represents the API endpoint that an attribution partner will send data to. You will need this url in the next step when setting up a callback in Apsalar's dashboard.
 
 __Step 3: Setting Up A Postback from Apsalar__
 
@@ -138,11 +157,11 @@ __Step 1: Integration Requirements__
 
 __Step 2: Getting the Attribution ID__
 
-In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14]. This page has postback urls for every attribution partner. This url represents the api endpoint that an attribution partner will send data to. Find the url for Kochava. This urls contains an `attribution_id` field that you will neec in the next step when setting up a postback in Kochava's dashboard.
+In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14] and find the API Key in the Kochava section. This key is used in the next step when setting up a postback in Kochava's dashboard.
 
 __Step 3: Setting Up A Postback from Kochava__
 
-Follow [these instructions][18] to add a postback in Kochava's dashboard. You will be prompted for the attribution_id that you found in Appboy's Dashboard in Step 2.
+Follow [these instructions][18] to add a postback in Kochava's dashboard. You will be prompted for the key that you found in Appboy's Dashboard in Step 2.
 
 __Step 4: Confirming the Integration__
 
@@ -163,13 +182,13 @@ mobileAppTracker.setUserId(Appboy.getInstance(MyActivity.this).getInstallTrackin
 
 __Step 2: Getting the Postback URL__
 
-In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14]. This page has postback urls for every attribution partner. This url represents the api endpoint that an attribution partner will send data to. Find the url for Tune. You will need this url in the next step when setting up a callback in Tune's dashboard.
+In Appboy's Dashboard, navigate to ["3rd Party Integrations" > "Attribution"][14] and find the Postback URL in the MobileAppTracking section. This url represents the api endpoint that an attribution partner will send data to. You will need this url in the next step when setting up a callback in Tune's dashboard.
 
 __Step 3: Setting Up A Postback from Tune__
 
 Follow [these instructions][19] to set up a postback in Tune's dashboard so that it sends attribution data to Appboy. This should be configured to send to the Postback URL you copied from Appboy's Dashboard in Step 2. Also configure the Postback to only send data for non-organic installs.
 
-Appboy maps Tune's Postback Macrots to segment filters in the following way
+Appboy maps Tune's Postback Macros to segment filters in the following way
 
 | Tune Postback Macro | Appboy Segment Filter |
 | -------------------- | --------------------- |
@@ -187,7 +206,9 @@ Once Appboy recieves attribution data from Tune, the status connection indicator
 [13]: /SDK_Integration/iOS#idfa-collection "IDFA Collection"
 [14]: https://dashboard.appboy.com/app_settings/integration/attribution "Attribution Integrations"
 [15]: https://docs.adjust.com/en/callbacks/ "Adjust Callbacks"
-[16]: http://support.appsflyer.com/entries/23657913-Push-APIs-Real-Time-Installation-Conversion-Notification-APIs "Appsflyer Push API"
+[16]: http://support.AppsFlyer.com/entries/23657913-Push-APIs-Real-Time-Installation-Conversion-Notification-APIs "AppsFlyer Push API"
 [17]: http://support.apsalar.com/customer/portal/articles/1503188-creating-and-managing-postbacks "Apsalar Postbacks"
-[18]: http://support.kochava.com/support/solutions/articles/1000071246-postback-configuration "Kochava Postbacks"
+[18]: http://support.kochava.com/support/solutions/articles/1000185675-create-a-kochava-certified-postback "Kochava Postbacks"
 [19]: http://support.mobileapptracking.com/entries/22560357-Setting-Up-Postback-URLs "Tune Postbacks"
+[20]: https://github.com/adjust/ios_sdk#9-implement-the-attribution-callback "Adjust SDK-to-SDK Integrations on iOS"
+[21]: https://github.com/adjust/android_sdk#16-set-listener-for-attribution-changes "Adjust SDK-to-SDK Integrations on Android"

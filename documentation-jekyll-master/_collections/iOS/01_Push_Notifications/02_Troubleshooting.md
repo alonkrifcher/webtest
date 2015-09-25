@@ -5,16 +5,22 @@ platform: iOS
 ## Troubleshooting
 
 ### Understanding the Appboy/APNs workflow
-  The Apple Push Notification service (APNs) is Apple's infrastructure for push notifications sent to iOS and OS X applications. Here is the simplified structure of how push notifications are enabled for your users' devices and how Appboy is able to send push notifications to them:
+
+  The Apple Push Notification service (APNs) is Apple's infrastructure for push notifications sending to iOS and OS X applications. Here is the simplified structure of how push notifications are enabled for your users' devices and how Appboy is able to send push notifications to them:
 
 #### Step 1: Configuring the push certificate and provisioning profile
-In the development of your app, you'll need to create an SSL certificate to enable push notifications. This certificate will be included in the provisioning profile your app is built with and will also need to be uploaded to the Appboy dashboard. The certificate allows Appboy to tell APNs that we are allowed to send push notifications on your behalf. __Note__: There are two types of provisioning profiles and certificates - development and distribution. We would recommend just using distribution profiles/certificates to avoid any confusion.
+
+In the development of your app, you'll need to create an SSL certificate to enable push notifications. This certificate will be included in the provisioning profile your app is built with and will also need to be uploaded to the Appboy dashboard. The certificate allows Appboy to tell APNs that we are allowed to send push notifications on your behalf.
+
+There are two types of provisioning profiles and certificates - development and distribution. We recommend just using distribution profiles/certificates to avoid any confusion. If you choose to use different profiles and certificates for development and distribution, make sure that the certificate uploaded to the dashboard matches the provisioning profile you are currently using. You can read more about provisioning profiles [here][provisioning profiles].
 
 #### Step 2: Devices register for APNs and provide Appboy with push tokens
+
 When users open your app, they will be prompted to accept push notifications. If they accept this prompt, then APNs will generate a push token for that particular device. The Appboy SDK will send this token along when the current session is closed. After we have a push token associated with a user, they will show as "Push Registered" in the dashboard on their user profile under the "Engagement" tab and will be eligible to receive push notifications from Appboy campaigns. __Note__: This does not work with the iOS Simulator. You cannot test push notifications with the iOS Simulator as a result.
 
 #### Step 3: Launching an Appboy push campaign
-When a push campaign is launched, Appboy will make requests to APNs to deliver your message. Appboy will use the SSL push certificate uploaded in the dashboard to authenticate and verify that we are allowed to send push notifications to the push tokens provided. When a push campaign is launched, Appboy will make requests to APNs to deliver your message. Appboy will use the SSL push certificate uploaded in the dashboard to authenticate and verify that we are allowed to send push notifications to the push tokens provided. If a device is online, the notification should be received shortly after the campaign has been sent. Appboy sets the default [expiration date][28] for notifications to 30 days for APNs to store the notification.
+
+When a push campaign is launched, Appboy will make requests to APNs to deliver your message. Appboy will use the SSL push certificate uploaded in the dashboard to authenticate and verify that we are allowed to send push notifications to the push tokens provided. If a device is online, the notification should be received shortly after the campaign has been sent. Appboy sets the default APNs [expiration date][14] for notifications to 30 days.
 
 #### Step 4: Removing invalid tokens
 If APNs informs us that any of the push tokens we were attempting to send a message to are invalid, we remove those tokens from the user profiles they were associated with.
@@ -25,7 +31,7 @@ Apple has more details about APNs in their [Developer Library][20].
 Appboy provides a ["Push Message Error Log" within the Developer Console][27]. This error log provides a variety of warnings which can be very helpful for identifying why your campaigns aren't working as expected. These warnings include but not are limited to:
 
 - Errors in integration
-- APNS Push Token & GCM Registration ID Invalidation
+- APNs Push Token & GCM Registration ID Invalidation
 
 ![Push Error Log][26]
 
@@ -75,7 +81,7 @@ Check the schedule you set for your test message. If it is set to local time zon
 
 Check the user profile of the user you are trying to send a test message to. Under the "Engagement" tab, there should be a list of "Pushable Apps". Verify the app you are trying to send test messages to is in this list. Users will show up as "Push Registered" if they have a push token for any app in your app group, so this could be something of a false positive.
 
-The following would indicate a problem with push registration, or that the user's token had been returned to Appboy as invalid by APNS after being pushed:
+The following would indicate a problem with push registration, or that the user's token had been returned to Appboy as invalid by APNs after being pushed:
 
 ![Push Problem][25]
 
@@ -88,3 +94,5 @@ The following would indicate a problem with push registration, or that the user'
 [26]: /assets/img/push_error_log.png
 [27]: https://dashboard.appboy.com/app_settings/developer_console/errorlog/
 [28]: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/CommunicatingWIthAPS.html
+[14]: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/CommunicatingWIthAPS.html
+[provisioning profiles]: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/ProvisioningDevelopment.html
