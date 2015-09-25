@@ -2,7 +2,7 @@
 title: In-App Messaging
 platform: Android and FireOS
 ---
-# In-App Messaging test
+# In-App Messaging
 
 __Time Estimate: 15 Minutes__
 
