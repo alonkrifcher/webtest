@@ -43,3 +43,7 @@ collections:
     relative_directory: _collections/Data_and_Analytics
   Best_Practices:
     relative_directory: _collections/Best_Practices
+  Mobile_Marketing_Resources:
+    relative_directory: _collections/Mobile_Marketing_Resources
+  Video_Modules:
+    relative_directory: _collections/Video_Modules
